@@ -1,7 +1,0 @@
-[
-  "test_groceries.py::test_list",
-  "test_groceries.py::test_search",
-  "test_groceries.py::test_add",
-  "test_groceries.py::test_delete",
-  "test_groceries.py::test_args_mulually_exclusive"
-]
