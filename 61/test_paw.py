@@ -25,7 +25,6 @@ def test_deck_size(deck, small_deck, big_deck):
     assert len(small_deck) == 16
     assert len(big_deck) == 64
 
-
 def test_number_action_cards(deck, small_deck, big_deck):
     assert sum(1 for card in deck if card.action is not None) == 8
     assert sum(1 for card in deck if card.action is None) == 24
