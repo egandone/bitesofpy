@@ -1,43 +1,33 @@
 from functools import singledispatch
 
-def _count_down(s):
-    while s:
-        print(s)
-        s = s[:-1]
-
 @singledispatch
 def count_down(data_type):
-    # TODO: Learn how to use singledispatch!
+    # Unless we have explicitly declared
+    # a handler it's an error.
     raise ValueError("Unsupported type")
 
+# This is the one that actually does
+# the printing.  All other types convert
+# their argument to a string and call this.
 @count_down.register
 def _(data_type: str):
-    _count_down(data_type)
+    while data_type:
+        print(data_type)
+        data_type = data_type[:-1]
 
-@count_down.register
-def _(data_type: int):
-    _count_down(str(data_type))
+@count_down.register(int)
+@count_down.register(float)
+def _(data_type):
+    count_down(str(data_type))
 
-@count_down.register
-def _(data_type: float):
-    _count_down(str(data_type))
+@count_down.register(list)
+@count_down.register(set)
+@count_down.register(tuple)
+@count_down.register(range)
+def _(data_type):
+    count_down(''.join([str(d) for d in data_type]))
 
-@count_down.register
-def _(data_type: list):
-    _count_down(''.join([str(d) for d in data_type]))
-
-@count_down.register
-def _(data_type: set):
-    _count_down(''.join([str(d) for d in data_type]))
-
+# For a dictionary count down the keys
 @count_down.register
 def _(data_type: dict):
-    _count_down(''.join([str(k) for k in data_type.keys()]))
-
-@count_down.register
-def _(data_type: tuple):
-    _count_down(''.join([str(d) for d in data_type]))
-
-@count_down.register
-def _(data_type: range):
-    _count_down(''.join([str(r) for r in data_type]))
+    count_down(''.join([str(k) for k in data_type.keys()]))
