@@ -50,7 +50,6 @@ def most_popular_characters(top=5):
     top_appearances = sorted(character_appearances.items(), key=lambda kv: kv[1], reverse=True)[:top]
     return [appearance[0] for appearance in top_appearances]
 
-
 def max_and_min_years_new_characters():
     """Get the year with most and least new characters introduced respectively,
        use either the 'FIRST APPEARANCE' or 'Year' column in the csv data, or
@@ -66,22 +65,6 @@ def max_and_min_years_new_characters():
     most = first_year_counter.most_common(1)[0]
     least = first_year_counter.most_common()[-1]
     return (str(most[0]), str(least[0]))
-
-def max_and_min_years_new_characters2():
-    """Get the year with most and least new characters introduced respectively,
-       use either the 'FIRST APPEARANCE' or 'Year' column in the csv data, or
-       the 'year' attribute of the namedtuple, return a tuple of
-       (max_year, min_year)"""
-    character_names = set([c.name for c in data if c.year])
-    first_appearances = {}
-    for name in character_names:
-        first_year = min([int(d.year) for d in data if d.name == name and d.year])
-        first_appearances[name] = first_year
-    first_year_counter = Counter(first_appearances.values())
-    most = first_year_counter.most_common(1)[0]
-    least = first_year_counter.most_common()[-1]
-    return (str(most[0]), str(least[0]))
-
 
 def percentage_female():
     """Get the percentage of female characters as percentage of all characters, rounded to 2 digits"""
