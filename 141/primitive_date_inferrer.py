@@ -52,6 +52,13 @@ def _maybe_DateFormats(date_str):
     return maybe_formats
 
 def _map_to_yyyymmdd_format(fmt, date_str):
+    """ Args:
+    fmt (str) the format used to parse date_str
+    date_str (str) the date string to parse and return in YYYY-MM-DD format
+    Returns:
+    str - the date_str in YYYY-MM-DD format if possible, 
+    otherwise it returns 'Invalid'
+    """
     yyyyddmm_date = 'Invalid'
     try:
         date = datetime.strptime(date_str, fmt)
@@ -92,9 +99,8 @@ def get_dates(dates):
     # From the class side method on DateFormat pull out the
     # date parsing string
     date_parse_fmt = DateFormat.get_d_parse_formats(top_formats[0][0].value)
-    # Iterate over all the dates using the most common format
-    # and then, if that worked, print it out in the standard 
-    # YYYY-MM-DD format.  If the date can't be parsed then 
-    # it get's mapped to 'Invalid'
+
+    # Now "map" all the original dates over to the standard YYYY-MM-DD
+    # format using the most common format as the source parsing
     return_dates = list(map(lambda d: _map_to_yyyymmdd_format(date_parse_fmt, d), dates))
     return return_dates
