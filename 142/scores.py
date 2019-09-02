@@ -16,7 +16,12 @@ def calculate_score(scores):
 
        Returns int of the sum of the scores.
     """
-    pass
+    bad_scores = filter(lambda s: s not in DICE_VALUES, scores)
+    bad_score = next(bad_scores, None)
+    if bad_score:
+      raise ValueError(f'There are invalid score(s) in {scores}')
+    high_score_total = sum(s for s in filter(lambda s: s >= MIN_SCORE, scores))
+    return high_score_total
 
 
 def get_winner(players):
@@ -37,4 +42,8 @@ def get_winner(players):
        output:
          Player(name='player 3', scores=[4, 5, 1, 2])
     """
-    pass
+    if next(filter(lambda p: len(p.scores) != 4, players), None):
+      raise ValueError('Player does not have 4 scores')
+
+    sorted_by_score = sorted(players, key=lambda p: calculate_score(p.scores), reverse=True)
+    return sorted_by_score[0]
