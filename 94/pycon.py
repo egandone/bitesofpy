@@ -35,7 +35,7 @@ def get_most_popular_talks_by_like_ratio(videos):
     return sorted(videos, key=lambda v: float(int(v.metrics['likeCount']) - int(v.metrics['dislikeCount']))/float(v.metrics['viewCount']), reverse=True)
 
 def duration_to_seconds(duration):
-   match = re.match('PT(\d+H)?(\d+M)?(\d+S)?', duration).groups()
+   match = re.match(r'PT(\d+H)?(\d+M)?(\d+S)?', duration).groups()
    hours = int(match[0][:-1]) if match[0] else 0
    minutes = int(match[1][:-1]) if match[1] else 0
    seconds = int(match[2][:-1]) if match[2] else 0
@@ -44,7 +44,6 @@ def duration_to_seconds(duration):
 def get_talks_gt_one_hour(videos):
     """Filter the videos list down to videos of > 1 hour"""
     return [video for video in videos if duration_to_seconds(video.duration) >= 3600]
-
 
 def get_talks_lt_twentyfour_min(videos):
     """Filter videos list down to videos that have a duration of less than
