@@ -51,6 +51,14 @@ def _maybe_DateFormats(date_str):
         maybe_formats.append(DateFormat.NONPARSABLE)
     return maybe_formats
 
+def _map_to_yyyymmdd_format(fmt, date_str):
+    yyyyddmm_date = 'Invalid'
+    try:
+        date = datetime.strptime(date_str, fmt)
+        yyyyddmm_date = f'{date:%Y-%m-%d}'
+    except ValueError:
+        pass
+    return yyyyddmm_date
 
 def get_dates(dates):
     """ Args:
@@ -63,4 +71,30 @@ def get_dates(dates):
     Alowed/supported date formats are defined in a DF enum class.
     """
     # complete this method
-    pass
+    format_counter = Counter()
+    for d in dates:
+        format_counter.update(_maybe_DateFormats(d))
+    top_formats = format_counter.most_common()
+    # Pull out the top format
+    top_format = top_formats[0][0]
+    # And it's count
+    top_format_count = top_formats[0][1]
+    # If most are unparsable raise an exception
+    if top_format == DateFormat.NONPARSABLE:
+        raise(InfDateFmtError('Mostly NONPARSABLE dates'))
+    # If there are more then one format and the counts
+    # for the top two are the same the we also raise an 
+    # exception because there is no way to know which format
+    # to use.
+    if (len(top_formats) > 1) and (top_format_count == top_formats[1][1]):
+        raise(InfDateFmtError('Tie for most common format'))
+
+    # From the class side method on DateFormat pull out the
+    # date parsing string
+    date_parse_fmt = DateFormat.get_d_parse_formats(top_formats[0][0].value)
+    # Iterate over all the dates using the most common format
+    # and then, if that worked, print it out in the standard 
+    # YYYY-MM-DD format.  If the date can't be parsed then 
+    # it get's mapped to 'Invalid'
+    return_dates = list(map(lambda d: _map_to_yyyymmdd_format(date_parse_fmt, d), dates))
+    return return_dates
