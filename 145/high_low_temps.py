@@ -33,19 +33,24 @@ def high_low_record_breakers_for_2015():
       * Return those as STATION namedtuples, (high_2015, low_2015)
    """
    df = pd.read_csv(DATA_FILE)
-   
-   # Find all the max temperatures across all stations for every day
-   max_temps = df[df['Element'] == 'TMAX'].groupby('Date')['Data_Value'].max()
-   # Drop any leap-days - should end up with 365 * 11 = 4015 total rows
-   max_temps.drop(inplace=True, index=max_temps[(max_temps.index.day == 29) & (max_temps.index.month == 2)].index)
+   df['Date'] = pd.to_datetime(df['Date']).apply(lambda x: x.date())
+   df['yyyy'] = df['Date'].apply(lambda x: x.year)
+   df['mmdd'] = df['Date'].apply(lambda x: f'{x:%m-%d}')
+   max_temps = df[df['Element'] == 'TMAX']
+   min_temps = df[df['Element'] == 'TMIN']
 
-   # Find all the min temperatures across all stations for every day
-   min_temps = df[df['Element'] == 'TMIN'].groupby('Date')['Data_Value'].min()
-   # Drop any leap-days - should end up with 365 * 11 = 4015 total rows
-   min_temps.drop(inplace=True, index=min_temps[(min_temps.index.day == 29) & (min_temps.index.month == 2)].index)
+   overall_maxs = max_temps.groupby('mmdd')['Data_Value'].max()
+   max_temps['overall_max'] = max_temps['mmdd'].apply(lambda x: overall_maxs[x])
 
-   before_2015_max_temps = max_temps[max_temps.index.year < 2015]
-   before_2015_min_temps = min_temps[min_temps.index.year < 2015]
-   in_2015_max_temps = max_temps[max_temps.index.year == 2015]
-   in_2015_min_temps = min_temps[min_temps.index.year == 2015]
+   overall_mins = min_temps.groupby('mmdd')['Data_Value'].min()
+   min_temps['overall_min'] = min_temps['mmdd'].apply(lambda x: overall_mins[x])
 
+   max_records = max_temps[(max_temps['yyyy'] == 2015) & (max_temps['Data_Value'] == max_temps['overall_max'])]
+   max_record = max_records.loc[max_records['Data_Value'].idxmax()]
+   max_station = STATION(max_record['ID'], max_record['Date'], max_record['Data_Value']/10.)
+
+   min_records = min_temps[(min_temps['yyyy'] == 2015) & (min_temps['Data_Value'] == min_temps['overall_min'])]
+   min_record = min_records.loc[min_records['Data_Value'].idxmin()]
+   min_station = STATION(min_record['ID'], min_record['Date'], min_record['Data_Value']/10.)
+
+   return (max_station, min_station)
