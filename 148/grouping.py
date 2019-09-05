@@ -25,4 +25,13 @@ def group_cars_by_manufacturer(cars):
        No return here, just print to the console. We use pytest > capfd to
        validate your output :)
     """
-    pass
+    groups = []
+    uniquekeys = []
+    data = sorted(cars, key=lambda car: car[0])
+    for k, g in groupby(data, lambda car: car[0]):
+        groups.append(list(g))
+        uniquekeys.append(k)
+    for group in groups:
+        print(f'\n{group[0][0].upper()}')
+        for m in group:
+            print(f'- {m[1]}')
