@@ -3,6 +3,8 @@ from datetime import date
 
 import pandas as pd
 
+pd.set_option('mode.chained_assignment', None)
+
 DATA_FILE = "http://projects.bobbelderbos.com/pcc/weather-ann-arbor.csv"
 STATION = namedtuple("Station", "ID Date Value")
 
@@ -47,10 +49,13 @@ def high_low_record_breakers_for_2015():
 
    max_records = max_temps[(max_temps['yyyy'] == 2015) & (max_temps['Data_Value'] == max_temps['overall_max'])]
    max_record = max_records.loc[max_records['Data_Value'].idxmax()]
-   max_station = STATION(max_record['ID'], max_record['Date'], max_record['Data_Value']/10.)
+   max_station = STATION(ID=max_record['ID'], Date=max_record['Date'], Value=max_record['Data_Value']/10.)
 
    min_records = min_temps[(min_temps['yyyy'] == 2015) & (min_temps['Data_Value'] == min_temps['overall_min'])]
    min_record = min_records.loc[min_records['Data_Value'].idxmin()]
-   min_station = STATION(min_record['ID'], min_record['Date'], min_record['Data_Value']/10.)
+   min_station = STATION(ID=min_record['ID'], Date=min_record['Date'], Value=min_record['Data_Value']/10.)
 
    return (max_station, min_station)
+
+if __name__ == '__main__':
+    print(high_low_record_breakers_for_2015())
