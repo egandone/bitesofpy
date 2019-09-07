@@ -9,7 +9,8 @@ pd.options.mode.chained_assignment = None  # ignore warnings
 
 def get_food_most_calories(df=df):
     """Return the food "Item" string with most calories"""
-    pass
+    max_calories_row = df.loc[df['Calories'].idxmax()]
+    return max_calories_row['Item']
 
 
 def get_bodybuilder_friendly_foods(df=df, excl_drinks=False):
@@ -23,4 +24,9 @@ def get_bodybuilder_friendly_foods(df=df, excl_drinks=False):
        right results.
 
        Return a list of the top 5 foot Item stings."""
-    pass
+    df_calories = df[df['Calories'] > 0]
+    if excl_drinks:
+        df_calories = df_calories[~df_calories['Category'].isin(['Beverages', 'Coffee & Tea'])]
+    df_calories['Protein/Calories Ratio'] = df_calories['Protein']/df_calories['Calories']
+    items = df_calories.sort_values('Protein/Calories Ratio',ascending=False).head(5)
+    return [item for item in items['Item']]
