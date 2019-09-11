@@ -56,10 +56,7 @@ class Corpora:
         :param txt: Corpus of text
         :return: cleaned up corpus
         """
-        out = ""
-        for c in self.txt.lower():
-            if (c not in punctuation):
-                out += c
+        out = ''.join([c for c in self.txt.lower() if c not in punctuation])
         for e in self.extra:
             out = out.replace(e, " ")
         return out
@@ -74,10 +71,8 @@ class Corpora:
 
         :return: List of tuples, i.e. ("word", count)
         """
-        word_counter = Counter()
-        for word in self.cleaned.split():
-            if word not in self.stopwords:
-                word_counter.update([word])
+        words = [word for word in self.cleaned.split() if word not in self.stopwords]
+        word_counter = Counter(words)
         return word_counter.most_common(self.count)
 
     @property
