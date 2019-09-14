@@ -2,8 +2,6 @@ import configparser
 import re
 
 class ToxIniParser:
-    
-
     def __init__(self, ini_file):
         """Use configparser to load ini_file into self.config"""
         self._config = configparser.ConfigParser()
