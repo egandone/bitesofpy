@@ -3,14 +3,14 @@ from urllib.request import urlretrieve
 
 import pandas as pd
 
-EXCEL = path.join('/tmp', 'order_data.xlsx')
+EXCEL = path.join(r'C:\WUTemp', 'order_data.xlsx')
 if not path.isfile(EXCEL):
     urlretrieve('https://bit.ly/2JpniQ2', EXCEL)
 
 def load_excel_into_dataframe(excel=EXCEL):
     """Load the SalesOrders sheet of the excel book (EXCEL variable)
        into a Pandas DataFrame and return it to the caller"""
-    return pd.read_excel(excel,sheet_name=1)
+    return pd.read_excel(excel,'SalesOrders')
 
 def get_year_region_breakdown(df):
     """Group the DataFrame by year and region, summing the Total
