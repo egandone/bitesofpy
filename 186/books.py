@@ -29,4 +29,4 @@ def get_number_books_read(books_per_year_goal: int,
     # year" - e.g. whatweekisit.com) and based on the books_per_year_goal,
     # calculate the number of books that should have been read / completed
     week = at_date.isocalendar()[1]
-    return round(books_per_year_goal * week / WEEKS_PER_YEAR)
+    return int(books_per_year_goal * week / WEEKS_PER_YEAR)
