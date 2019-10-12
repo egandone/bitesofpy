@@ -29,7 +29,6 @@ def top_python_questions(url=cached_so_url):
             votes = int(summary.find_all(class_='vote-count-post')[0].text)
             views = summary.find_all(class_='views')[0]
             views = get_views_count(views)
-            print(f'{id}: {hyperlink.text}, {votes}, {views}')
             if views > 1000000:
                 questions.append((hyperlink.text, votes))
         questions.sort(key=lambda c: c[1], reverse=True)
