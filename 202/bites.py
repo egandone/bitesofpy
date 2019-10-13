@@ -2,7 +2,7 @@ import csv
 from pathlib import Path
 from urllib.request import urlretrieve
 
-tmp = Path(r'C:\WUTemp')
+tmp = Path('/tmp')
 stats = tmp / 'bites.csv'
 
 if not stats.exists():
