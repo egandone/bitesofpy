@@ -4,7 +4,7 @@ from collections import defaultdict
 
 from bs4 import BeautifulSoup as Soup
 
-out_dir = r"C:\WUTemp"
+out_dir = "/tmp"
 html_file = f"{out_dir}/enchantment_list_pc.html"
 
 HTML_FILE = Path(html_file)
@@ -95,9 +95,8 @@ def generate_enchantments(soup):
             max_level = level_map[item_cells[1].text.strip()]
             description = item_cells[2].text
             image = item_cells[4].img['data-src'].split('/')[-1]
-            items = parse_image_to_item_names(image)
             enchantment = Enchantment(name_id, name, max_level, description)
-            enchantment.items += items
+            enchantment.items += parse_image_to_item_names(image)
             enchantments[name_id] = enchantment
     return enchantments
 
