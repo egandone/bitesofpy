@@ -1,5 +1,5 @@
-import decimal
 import math
+import decimal
 
 # Need to "quantize" our currency amounts
 # to 1 cent so they render consistently
