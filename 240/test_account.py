@@ -4,7 +4,7 @@ from account import Account
 # write your pytest functions below, they need to start with test_
 
 def test_ordering():
-    account1 = Account('owner1', 0)
+    account1 = Account('owner1')
     assert str(account1) == 'Account of owner1 with starting amount: 0'
     assert repr(account1) == 'Account(\'owner1\', 0)'
     account2 = Account('owner2', 0)
@@ -19,6 +19,8 @@ def test_ordering():
 
     account1.add_transaction(-10)
     assert account1 == account2
+    assert not account1 < account2
+    assert not account1 > account2
 
     assert account1.balance == 0
     assert account2.balance == 0
