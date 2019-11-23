@@ -1,6 +1,6 @@
 import requests
 
-YOUR_KEY = 'esxnGCl5OZJFYtiK6lMQRfmYW2t3lUXO'
+YOUR_KEY = '......'
 DEFAULT_LIST = 'hardcover-nonfiction'
 
 URL_NON_FICTION = (f'https://api.nytimes.com/svc/books/v3/lists/current/'
