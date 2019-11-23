@@ -23,7 +23,7 @@ def get_best_seller_titles(url=URL_NON_FICTION):
 
        Dev docs: https://developer.nytimes.com/docs/books-product/1/overview
     """
-    request = requests.get(URL_NON_FICTION)
+    request = requests.get(url)
     if request.ok:
         json = request.json()
         titles = [(book['title'], book['weeks_on_list'])
