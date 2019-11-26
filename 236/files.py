@@ -24,11 +24,10 @@ def get_matching_files(directory: PosixPath, filter_str: str) -> list:
        get_matching_files(d, 'o$tput') => ['output']
        get_matching_files(d, 'nonsense') => []
     """
-    filter_str = filter_str.lower()
     files = {file.name.lower(): file for file in directory.iterdir()
              if file.is_file()}
-    if filter_str in files:
-        return [files[filter_str].name]
+    if filter_str.lower() in files:
+        return [files[filter_str.lower()].name]
     else:
         best_match = [files[f].name for f in difflib.get_close_matches(
             filter_str, files.keys())]
