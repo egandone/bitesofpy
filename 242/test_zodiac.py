@@ -9,6 +9,7 @@ import pytest
 
 from zodiac import (get_signs, get_sign_with_most_famous_people,
                     signs_are_mutually_compatible, get_sign_by_date)
+from zodiac import Sign
 
 # original source: https://zodiacal.herokuapp.com/api
 URL = "https://bites-data.s3.us-east-2.amazonaws.com/zodiac.json"
@@ -25,6 +26,12 @@ def signs():
     return get_signs(data)
 
 
+def test_sign2():
+    sign = Sign(name='name', compatibility='compatibility',
+                famous_people='famous_people', sun_dates='sun_date')
+    assert(sign.__class__.__name__ == 'Sign')
+
+
 def test_sign():
     aries_json = json.loads('''[{ 
         "name": "Aries",
@@ -33,11 +40,14 @@ def test_sign():
         "sun_dates": ["March 21", "April 19"]}]''')
     signs = get_signs(aries_json)
     assert(len(signs) == 1)
+    assert(type(signs[0]) == Sign)
     assert(signs[0].name == 'Aries')
     assert(signs[0].compatibility == [
            'Leo', 'Sagittarius', 'Gemini', 'Aquarius'])
     assert(signs[0].famous_people == ['Famous1', 'Famous2'])
     assert(signs[0].sun_dates == ['March 21', 'April 19'])
+
+    assert(get_signs([]) == [])
 
 
 def test_get_sign_with_most_famous_people(signs):
