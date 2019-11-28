@@ -25,6 +25,21 @@ def signs():
     return get_signs(data)
 
 
+def test_sign():
+    aries_json = json.loads('''[{ 
+        "name": "Aries",
+        "famous_people": ["Famous1", "Famous2"],
+        "compatibility": ["Leo", "Sagittarius", "Gemini", "Aquarius"],
+        "sun_dates": ["March 21", "April 19"]}]''')
+    signs = get_signs(aries_json)
+    assert(len(signs) == 1)
+    assert(signs[0].name == 'Aries')
+    assert(signs[0].compatibility == [
+           'Leo', 'Sagittarius', 'Gemini', 'Aquarius'])
+    assert(signs[0].famous_people == ['Famous1', 'Famous2'])
+    assert(signs[0].sun_dates == ['March 21', 'April 19'])
+
+
 def test_get_sign_with_most_famous_people(signs):
     most_famous = get_sign_with_most_famous_people(signs)
     assert(most_famous == ('Scorpio', 35))
