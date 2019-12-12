@@ -6,3 +6,6 @@ __pycache__/
 venv37/
 venv36/
 venv/
+.coverage
+htmlcov/
+report/
