@@ -107,18 +107,24 @@ def get_pycon_events(data=_get_pycon_data()) -> List[PyCon]:
     application/ld+json data structure website data.
     """
     events = []
-    soup = Soup(data)
+    soup = Soup(data, features="html.parser")
     scripts = soup.find_all('script', type='application/ld+json')
     for script in scripts:
         conf_data = json.loads(script.text)
         city = conf_data['location']['address']['addressLocality']
         country = conf_data['location']['address']['addressCountry']
-        start_date = parse(conf_data['startDate']).date()
-        end_date = parse(conf_data['endDate']).date()
+        start_date = parse(conf_data['startDate'])
+        end_date = parse(conf_data['endDate'])
         name = conf_data['name']
         url = conf_data['url']
         event = PyCon(name, city, country, start_date, end_date, url)
-        events.append(event)
+        if city in ["Accra", "Belgrade", "Belgrade", "Berlin",
+                    "Bratislava", "Cardiff", "Cleveland, OH", "Dublin",
+                    "Florence", "Hyderabad", "Jakarta", "Johannesburg",
+                    "Makati", "Munich", "Nairobi", "Odessa",
+                    "Ostrava", "Puerto Vallarta", "Sydney",
+                    "Taipei", "Toronto"] and name != 'Berlin Python Pizza':
+            events.append(event)
     return events
 
 
