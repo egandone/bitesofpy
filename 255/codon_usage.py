@@ -49,6 +49,22 @@ def get_translation_map(table):
              for p in pairs if p[0].strip() == 'Base3'][0].replace('T', 'U')
     return {''.join(z[0:3]): z[3] for z in zip(base1, base2, base3, AAs)}
 
+def render_header():
+    return '|  Codon AA  Freq  Count  |  Codon AA  Freq  Count  |  Codon AA  Freq  Count  |  Codon AA  Freq  Count  |'
+
+def render_separator():
+    return '---------------------------------------------------------------------------------------------------------'
+
+def render_cell(codon, aa, count, total):
+    freq = count / total * 1000
+    return f'  {codon}:  {aa}   {freq:4.1f}  {count:5}  |'
+
+def render_row(codons, codon_counter, translation_map, total):
+    str = '|'
+    for codon in codons:
+        str = str + render_cell(codon, translation_map[codon], codon_counter[codon], total)
+    return str
+
 
 def return_codon_usage_table(
     sequences=_preload_sequences(), translation_table_str=TRANSL_TABLE_11
@@ -62,19 +78,34 @@ def return_codon_usage_table(
     Skip invalid coding sequences:
        --> must consist entirely of codons (3-base triplet)
     """
-    rows = ['Codon AA  Freq  Count',
-            'Codon AA  Freq  Count',
-            'Codon AA  Freq  Count',
-            'Codon AA  Freq  Count']
-    translation_map = get_translation_map(translation_table_str)
+    # The counter will have 64 entries at the end - one for each codon
+    # And the count will be the total number of occurances of that codon
+    # in all the sequences.
     codon_counter = Counter()
     for sequence in [s.strip() for s in sequences]:
+        # Just split each sequence up into 3 character codons
         codons = [sequence[r:r+3] for r in range(0, len(sequence), 3)]
+        # Add them all to the counter
         codon_counter.update(codons)
+
+    # Get the total number of codons by summing up all the counts
     total_count = sum(codon_counter.values())
-    for codon, aa in translation_map.items():
-        freq = codon_counter[codon] / total_count * 1000
-        rows.append(f'{codon}: {aa} {freq:.1f} {codon_counter[codon]}')
+    
+    # Get the codon list from the translation_map.  This
+    # defines the order in which we render all the counts
+    translation_map = get_translation_map(translation_table_str)
+    codons = list(translation_map.keys())
+    
+    # Start the table with the header and separator
+    rows = [render_header(), render_separator()]
+    # Render the codes in blocks of 16 divided into 4 colums
+    for c in range(0, len(codons), 16):
+        for i in range(c,c+4):
+            names = [codons[i], codons[i+4], codons[i+8], codons[i+12]]
+            rows.append(render_row(names, codon_counter, translation_map, total_count))
+        # Render a separator between each block
+        rows.append(render_separator())
+    # Return the table as all the rows joined together by newines
     return '\n'.join(rows)
 
 
