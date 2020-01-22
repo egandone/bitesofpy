@@ -1,13 +1,19 @@
-import requests
+from urllib.request import urlretrieve
+import os
+from pathlib import Path
 import csv
 
 XYZ = "https://bites-data.s3.us-east-2.amazonaws.com/xyz.csv"
+PATH = Path(os.getenv('TMP', r'C:\WUTemp'), "xyz.csv")
 THRESHOLDS = (5000, 0.05)
 
 
 def get_XYZ():
-    with requests.Session() as session:
-        return [line for line in session.get(XYZ).content.decode("utf-8").split('\n') if line.strip()]
+    urlretrieve(XYZ, PATH)
+    lines = []
+    with open(PATH) as xyz_file:
+        lines = [line.strip() for line in xyz_file.readlines() if line.strip()]
+    return lines
 
 
 def calculate_flux(XYZ: str) -> list:
