@@ -20,13 +20,18 @@ class LightsGrid:
         :param s1: The bottom right hand corner of the grid to operate on
 
         Suggested return are 4 integers representing x1, x2, y1, y2 [hint]"""
-        pass
+        (x1, y1) = [int(_.strip()) for _ in s1.split(',')]
+        (x2, y2) = [int(_.strip()) for _ in s2.split(',')]
+        return (x1, x2, y1, y2)
 
     def validate_grid(self):
         """A helper function you might want to write to verify that:
           - no lights are brighter than 5
           - no lights are less than 0"""
-        pass
+        mask_hi = self.grid.apply(lambda x: x > 5)
+        self.grid[mask_hi] = 5
+        mask_low = self.grid.apply(lambda x: x < 0)
+        self.grid[mask_low] = 0
 
     def turn_on(self, s1: str, s2: str):
         """The turn_on function takes 2 parameters:
@@ -39,14 +44,16 @@ class LightsGrid:
           - If the light is off, turn it on at intensity 1
         """
         # Process grid coordinates
+        (x1, x2, y1, y2) = self.process_grid_coordinates(s1, s2)
 
         # First extract the slice of the grid into a new dataframe
+        mask = self.grid.iloc[x1:x2+1, y1:y2+1]
 
         # Now create a mask of all lights == 0 in the slice
+        mask = mask.apply(lambda x: x == 0)
 
         # # Now turn on all lights that are off
-
-        # Finally overwrite the grid with the new values
+        self.grid[mask] = 1
 
     def turn_off(self, s1: str, s2: str):
         """The turn_off function takes 2 parameters:
@@ -55,7 +62,10 @@ class LightsGrid:
         :param s1: The bottom right hand corner of the grid to operate on
 
         Turn off all lights in the grid slice given."""
-        pass
+        (x1, x2, y1, y2) = self.process_grid_coordinates(s1, s2)
+        mask = self.grid.iloc[x1:x2+1, y1:y2+1]
+        mask = mask.apply(lambda x: x > 0)
+        self.grid[mask] = 0
 
     def turn_up(self, amount: int, s1: str, s2: str):
         """The turn_up function takes 3 parameters:
@@ -66,7 +76,11 @@ class LightsGrid:
 
         For each light in the grid slice given turn the light up
           by the given amount. Don't turn a light up past 5"""
-        pass
+        (x1, x2, y1, y2) = self.process_grid_coordinates(s1, s2)
+        mask = self.grid.iloc[x1:x2+1, y1:y2+1]
+        mask = mask.apply(lambda x: x < 5)
+        self.grid[mask] += amount
+        self.validate_grid()
 
     def turn_down(self, amount: int, s1: str, s2: str):
         """The turn down function takes 3 parameters:
@@ -77,7 +91,11 @@ class LightsGrid:
 
         For each light in the grid slice given turn the light down
           by the given amount. Don't turn a light down past 0"""
-        pass
+        (x1, x2, y1, y2) = self.process_grid_coordinates(s1, s2)
+        mask = self.grid.iloc[x1:x2+1, y1:y2+1]
+        mask = mask.apply(lambda x: x > 0)
+        self.grid[mask] -= amount
+        self.validate_grid()
 
     def toggle(self, s1: str, s2: str):
         """The toggle function takes 2 parameters:
@@ -90,15 +108,32 @@ class LightsGrid:
           - If the light is off, turn it on at intensity 3
         """
         # Process grid coordinates
+        (x1, x2, y1, y2) = self.process_grid_coordinates(s1, s2)
 
         # First extract the slice of the grid into a new dataframe
+        mask = self.grid.iloc[x1:x2+1, y1:y2+1]
+        mask_on = mask.apply(lambda x: x == 0)
+        mask_off = mask.apply(lambda x: x > 0)
 
-        # Now create a mask of all lights > 0 in the slice
+        self.grid[mask_on] = 3
+        self.grid[mask_off] = 0
 
-        # Now turn off all lights that are on in the slice
-        # Set all lights that are off to 3 in the slice
-
-        # Finally overwrite the grid with the new values
+    def follow_instrction(self, instruction: str):
+        tokens = instruction.split(' ')
+        s1 = tokens[-3]
+        s2 = tokens[-1]
+        if instruction.startswith('turn on'):
+            self.turn_on(s1, s2)
+        elif instruction.startswith('turn off'):
+            self.turn_off(s1, s2)
+        elif instruction.startswith('turn down'):
+            amount = int(tokens[2])
+            self.turn_down(amount, s1, s2)
+        elif instruction.startswith('turn up'):
+            amount = int(tokens[2])
+            self.turn_up(amount, s1, s2)
+        elif instruction.startswith('toggle'):
+            self.toggle(s1, s2)
 
     def follow_instructions(self):
         """Function to process all instructions.
@@ -106,7 +141,8 @@ class LightsGrid:
         Each instruction should be processed in sequence,
           excluding the first instruction of course.
         """
-        pass
+        for instruction in self.instructions:
+            self.follow_instrction(instruction)
 
     @property
     def lights_intensity(self):
