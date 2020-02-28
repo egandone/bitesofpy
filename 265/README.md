@@ -1,4 +1,4 @@
-## [Bite 265. Write tests for Fernet anagram](https://codechalleng.es/bites/265/)
+## [Bite 265. Optimal fund raising](https://codechalleng.es/bites/265/)
 
 Good luck and please share you code in the Bite forums upon completion.
 
