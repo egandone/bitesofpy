@@ -16,6 +16,19 @@ URL = "https://bites-data.s3.us-east-2.amazonaws.com/zodiac.json"
 TMP = os.getenv("TMP", "/tmp")
 PATH = Path(TMP, "zodiac.json")
 
+all_signs = ['Aries',
+             'Taurus',
+             'Gemini',
+             'Cancer',
+             'Leo',
+             'Virgo',
+             'Libra',
+             'Scorpio',
+             'Sagittarius',
+             'Capricorn',
+             'Aquarius',
+             'Pisces']
+
 
 @pytest.fixture(scope='module')
 def signs():
@@ -26,7 +39,13 @@ def signs():
     return get_signs(data)
 
 
-def test_sign2():
+def test_signs(signs):
+    assert(len(signs) == 12)
+    assert(len(set(all_signs).intersection(
+        [sign.name for sign in signs])) == 12)
+
+
+def test_sign2(signs):
     sign = Sign(name='name', compatibility='compatibility',
                 famous_people='famous_people', sun_dates='sun_date')
     assert(sign.__class__.__name__ == 'Sign')
@@ -56,6 +75,9 @@ def test_get_sign_with_most_famous_people(signs):
 
 
 def test_get_sign_by_date(signs):
+    # This should work but the code has a bug the makes this fail.
+    #
+    # ('Capricorn', 'December 22', 'January 19'),
     tests = [('Aries', 'March 21', 'April 19'),
              ('Taurus', 'April 20', 'May 20'),
              ('Gemini', 'May 21', 'June 20'),
@@ -65,7 +87,6 @@ def test_get_sign_by_date(signs):
              ('Libra', 'September 23', 'October 22'),
              ('Scorpio', 'October 23', 'November 21'),
              ('Sagittarius', 'November 22', 'December 21'),
-             #             ('Capricorn', 'December 22', 'January 19'),
              ('Aquarius', 'January 20', 'February 18'),
              ('Pisces', 'February 19', 'March 20')]
     one_day = timedelta(days=1)
@@ -79,18 +100,6 @@ def test_get_sign_by_date(signs):
 
 
 def test_signs_are_mutually_compatible(signs):
-    all_signs = ['Aries',
-                 'Taurus',
-                 'Gemini',
-                 'Cancer',
-                 'Leo',
-                 'Virgo',
-                 'Libra',
-                 'Scorpio',
-                 'Sagittarius',
-                 'Capricorn',
-                 'Aquarius',
-                 'Pisces']
     for (sign1, sign2) in permutations(all_signs, 2):
         assert(signs_are_mutually_compatible(signs, sign1, sign2) ==
                signs_are_mutually_compatible(signs, sign2, sign1))
