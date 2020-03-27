@@ -12,13 +12,14 @@ from bs4 import BeautifulSoup as Soup  # type: ignore
 TMP = getenv("TMP", "/tmp")
 TODAY = date.today()
 Candidate = namedtuple("Candidate", "name votes")
-LeaderBoard = namedtuple(
-    "LeaderBoard", "Candidate Average Delegates Contributions Coverage"
+LeaderBoard = NamedTuple(
+    "LeaderBoard", [("Candidate", str), ('Average', str),
+                    ('Delegates', int),  ('Contributions', str), ('Coverage', int)]
 )
 Poll = NamedTuple(
     "Poll",
     [('Poll', str), ('Date', str), ('Sample', str), ('Sanders', float),
-        ('Biden', float), ('Gabbard', float), ('Spread', str)],
+        ('Biden', float), ('Gabbard', float), ('Spread', str)]
 )
 
 
@@ -361,7 +362,19 @@ class NYTimes(Site):
             List[LeaderBoard] -- List of LeaderBoard namedtuples that were created from
             the table data.
         """
-        pass
+        polls = []
+        for tr in table.find_all('tr'):
+            columns = tr.find_all('td')
+            if (len(columns) == 5):
+                poll = LeaderBoard(Candidate=columns[0].text.strip(),
+                                   Average=columns[1].text.strip(),
+                                   Delegates=int(columns[2].text.strip()),
+                                   Contributions=columns[3].text.strip(),
+                                   Coverage=int(columns[4].text.strip()[1:]))
+                polls.append(poll)
+        if len(polls) == 0:
+            polls = None
+        return polls
 
     def polls(self, table: int = 0) -> List[LeaderBoard]:
         """Parses the data
@@ -378,7 +391,7 @@ class NYTimes(Site):
             List[LeaderBoard] -- List of LeaderBoard namedtuples that were created from
                 the table data.
         """
-        pass
+        return self.parse_rows(self.find_table(table))
 
     def stats(self, loc: int = 0):
         """Produces the stats from the polls.
@@ -387,7 +400,20 @@ class NYTimes(Site):
             loc {int} -- Formats the results from polls into a more user friendly
             representation.
         """
-        pass
+        lines = []
+        lines.append('NYTimes')
+        lines.append('=================================')
+        for poll in self.polls(loc):
+            lines.append('')
+            lines.append(f'{poll.Candidate.rjust(33)}')
+            lines.append('---------------------------------')
+            lines.append(f'National Polling Average: {poll.Average}')
+            lines.append(f'       Pledged Delegates: {poll.Delegates}')
+            lines.append(f'Individual Contributions: {poll.Contributions}')
+            lines.append(f'    Weekly News Coverage: {poll.Coverage}')
+
+        lines.append('')
+        print('\n'.join(lines))
 
 
 def gather_data():
