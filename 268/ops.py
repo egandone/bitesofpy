@@ -8,34 +8,25 @@ def get_value_map():
     global value_map
     if value_map == None:
         value_map = dict()
-        value_map[1] = len('223')
-        value_map[2] = len('2')
-        value_map[4] = len('22')
-        value_map[8] = len('222')
-        value_map[16] = len('2222')
-        value_map[32] = len('22222')
-        value_map[64] = len('222222')
-        value_map[1985] = 42
 
-        old_sequence_map = array('i', [8])
-        for i in range(4, 26):
-            #            print(f'doing len={i}, {len(old_sequence_map)*2} additions')
-            new_sequence_map = array('i')
-            for value in old_sequence_map:
+        # Initialize the set of generated numbers
+        # with 1 (i.e., sequence length = 0)
+        old_sequence_set = set([1])
+        for sequence_length in range(1, 50):
+            # This set will contain all the generated numbers
+            # after adding one operation.
+            new_sequence_set = set()
+            for value in old_sequence_set:
                 new_value = value * 2
-                # if new_value == 10:
-                #     print(f'10 --> {new_key}')
-                new_sequence_map.extend([new_value])
+                new_sequence_set.add(new_value)
                 if new_value not in value_map:
-                    value_map[new_value] = i
+                    value_map[new_value] = sequence_length
 
                 new_value = value // 3
-                # if new_value == 10:
-                #     print(f'10 --> {new_key}')
-                new_sequence_map.extend([new_value])
+                new_sequence_set.add(new_value)
                 if new_value not in value_map:
-                    value_map[new_value] = i
-            old_sequence_map = new_sequence_map
+                    value_map[new_value] = sequence_length
+            old_sequence_set = new_sequence_set
     return value_map
 
 

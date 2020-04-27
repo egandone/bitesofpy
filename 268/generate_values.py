@@ -32,7 +32,7 @@ def analyze(tuples):
 
 
 analyze([(2, 2, 2)])
-for i in range(4, 30):
+for i in range(4, 26):
     analyze(product([2, 3], repeat=i))
 
 for i in [10, 12, 15, 33, 55, 102, 1985, 2020, 3012]:
