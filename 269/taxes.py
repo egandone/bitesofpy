@@ -21,7 +21,7 @@ pay $4,658.50, not $40,000 x 22% = $8,800!
               Total =     4,658.50
 
 More detail can be found here:
-https://www.nerdwallet.com/blog/taxes/federal-income-tax-brackets/
+https://www.nerdwallet.com/blog/taxes/federal-income-tax-bracket/
 
 Sample output from running the code in the if/main clause:
 
@@ -64,8 +64,28 @@ class Taxes:
 
     """
 
-    def __init__(self, amount):
-        self._amount = amount
+    def __init__(self, income, bracket=BRACKET):
+        self.income = income
+        self.bracket = bracket
+        self.tax_amounts = []
+        bracket_start = 0
+        for bracket in [b for b in self.bracket[:-1] if b.end < self.income]:
+            tax = Taxed(amount=bracket.end - bracket_start,
+                        rate=bracket.rate,
+                        tax=(bracket.end - bracket_start) * bracket.rate)
+            bracket_start = bracket.end
+            self.tax_amounts.append(tax)
+
+        final_taxable_amount = self.income
+        if (len(self.tax_amounts) > 0):
+            final_taxable_amount -= self.bracket[len(
+                self.tax_amounts) - 1].end
+
+        tax = Taxed(amount=final_taxable_amount, rate=self.bracket[len(
+            self.tax_amounts)].rate, tax=final_taxable_amount * self.bracket[len(self.tax_amounts)].rate)
+        self.tax_amounts.append(tax)
+
+        self._taxes = sum([tax.tax for tax in self.tax_amounts])
 
     def __str__(self) -> str:
         """Summary Report
@@ -75,17 +95,29 @@ class Taxes:
 
             Example:
 
-                      Summary Report          
+                      Summary Report
             ==================================
              Taxable Income:        40,000.00
                  Taxes Owed:         4,658.50
                    Tax Rate:           11.65%
         """
-        pass
+        str = f'''          Summary Report
+==================================
+ Taxable Income:    {self.income:13,.2f}
+     Taxes Owed:    {self.taxes:13,.2f}
+       Tax Rate:    {self.tax_rate:12,.2f}%'''
+        return str
 
     def report(self):
         """Prints taxes breakdown report"""
-        pass
+        print(str(self))
+        print()
+        print("        Taxes Breakdown")
+        print("==================================")
+        for t in self.tax_amounts:
+            print(f'{t.amount:12,.2f} x {t.rate:3.2f} = {t.tax:12,.2f}')
+        print('----------------------------------')
+        print(f'              Total = {self.total:12,.2f}')
 
     @property
     def taxes(self) -> float:
@@ -97,7 +129,7 @@ class Taxes:
         Returns:
             float -- The amount of taxes owed
         """
-        pass
+        return self._taxes
 
     @property
     def total(self) -> float:
@@ -106,7 +138,7 @@ class Taxes:
         Returns:
             float -- Total taxes owed
         """
-        pass
+        return self._taxes
 
     @property
     def tax_rate(self) -> float:
@@ -115,7 +147,7 @@ class Taxes:
         Returns:
             float -- Tax rate
         """
-        pass
+        return round(self._taxes / self.income * 10000.) / 100.
 
 
 if __name__ == "__main__":
