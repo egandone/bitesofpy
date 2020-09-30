@@ -9,6 +9,20 @@ def count_n_repetitions(text, n=1):
     text: UTF-8 compliant input text
     n: How often character should be repeated, defaults to 1
     """
+    if n < 1:
+        return 0
+    expr = f'(.)\\1{{{n}}}'
+    pattern = re.compile(expr,  re.DOTALL)
+    p = 0
+    count = 0
+    while p < len(text):
+        m = pattern.search(text, p)
+        if m:
+            p = m.start() + 1
+            count += 1
+        else:
+            p = len(text)
+    return count
 
 
 def count_n_reps_or_n_chars_following(text, n=1, char=""):
@@ -20,6 +34,24 @@ def count_n_reps_or_n_chars_following(text, n=1, char=""):
     n: How often character should be repeated, defaults to 1
     char: Character which also counts if repeated n times
     """
+    if n < 1:
+        return 0
+    if not char:
+        return count_n_repetitions(text, n)
+    if char in ['?', '[', ']', '^']:
+        char = '\\' + char
+    expr = f'(.)(\\1{{{n}}}|{char}{{{n}}})'
+    pattern = re.compile(expr,  re.DOTALL)
+    p = 0
+    count = 0
+    while p < len(text):
+        m = pattern.search(text, p)
+        if m:
+            p = m.start() + 1
+            count += 1
+        else:
+            p = len(text)
+    return count
 
 
 def check_surrounding_chars(text, surrounding_chars):
