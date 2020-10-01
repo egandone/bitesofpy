@@ -11,18 +11,10 @@ def count_n_repetitions(text, n=1):
     """
     if n < 1:
         return 0
-    expr = f'(.)\\1{{{n}}}'
+    # Only match a char if it's followed by n iterations of itself
+    expr = f'(.)(?=\\1{{{n}}})'
     pattern = re.compile(expr,  re.DOTALL)
-    p = 0
-    count = 0
-    while p < len(text):
-        m = pattern.search(text, p)
-        if m:
-            p = m.start() + 1
-            count += 1
-        else:
-            p = len(text)
-    return count
+    return len(pattern.findall(text))
 
 
 def count_n_reps_or_n_chars_following(text, n=1, char=""):
@@ -38,20 +30,12 @@ def count_n_reps_or_n_chars_following(text, n=1, char=""):
         return 0
     if not char:
         return count_n_repetitions(text, n)
-    if char in ['?', '[', ']', '^']:
-        char = '\\' + char
-    expr = f'(.)(\\1{{{n}}}|{char}{{{n}}})'
+    # '\1{n}' --> n iterations of what was matched by (.)
+    # '{re.escape(char)}{n}' --> n iterations of the fixed char.
+    #                            re.escape() handles any special characters, eg. '?' -> '\?'
+    expr = f'(.)(?=(\\1{{{n}}}|{re.escape(char)}{{{n}}}))'
     pattern = re.compile(expr,  re.DOTALL)
-    p = 0
-    count = 0
-    while p < len(text):
-        m = pattern.search(text, p)
-        if m:
-            p = m.start() + 1
-            count += 1
-        else:
-            p = len(text)
-    return count
+    return len(pattern.findall(text))
 
 
 def check_surrounding_chars(text, surrounding_chars):
@@ -62,3 +46,10 @@ def check_surrounding_chars(text, surrounding_chars):
     text: UTF-8 compliant input text
     surrounding_chars: List of characters
     """
+    # Build the concatenated list of specified chars, use re.escape() to handle special chars.
+    escaped_chars = ''.join([re.escape(c) for c in surrounding_chars])
+    # '(?<=[{escaped_chars}])' --> match if preceeded by any of the surrounding chars
+    # '(?=[{escaped_chars}])' --> match only if followed by any of the special chars
+    expr = f'(?<=[{escaped_chars}]).(?=[{escaped_chars}])'
+    pattern = re.compile(expr, re.DOTALL)
+    return len(pattern.findall(text))
