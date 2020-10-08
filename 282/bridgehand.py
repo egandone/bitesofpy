@@ -26,6 +26,10 @@ class BridgeHand:
             if not isinstance(card, Card):
                 raise ValueError
         self._cards = cards
+        self._suit_cards = dict()
+        for suit in Suit:
+            self._suit_cards[suit] = [c[1]
+                                      for c in self._cards if c[0] == suit]
 
     def __str__(self) -> str:
         """
@@ -60,36 +64,27 @@ class BridgeHand:
     @property
     def doubletons(self) -> int:
         """ Return the number of doubletons contained in this hand """
-        _doubletons = 0
-        for suit in Suit:
-            suit_count = len([c for c in self._cards if c[0] == suit])
-            if suit_count == 2:
-                _doubletons += 1
-        return _doubletons
+        _doubletons = [cards for (
+            suit, cards) in self._suit_cards.items() if len(cards) == 2]
+        return len(_doubletons)
 
     @property
     def singletons(self) -> int:
         """ Return the number of singletons contained in this hand """
-        _singletons = 0
-        for suit in Suit:
-            suit_count = len([c for c in self._cards if c[0] == suit])
-            if suit_count == 1:
-                _singletons += 1
-        return _singletons
+        _singletons = [cards for (
+            suit, cards) in self._suit_cards.items() if len(cards) == 1]
+        return len(_singletons)
 
-    @property
+    @ property
     def voids(self) -> int:
         """ Return the number of voids (missing suits) contained in
             this hand
         """
-        _voids = 0
-        for suit in Suit:
-            suit_count = len([c for c in self._cards if c[0] == suit])
-            if suit_count == 0:
-                _voids += 1
-        return _voids
+        _voids = [cards for (
+            suit, cards) in self._suit_cards.items() if len(cards) == 0]
+        return len(_voids)
 
-    @property
+    @ property
     def ssp(self) -> int:
         """ Return the number of short suit points in this hand.
             Doubletons are worth one point, singletons two points,
@@ -97,33 +92,32 @@ class BridgeHand:
         """
         return self.voids * 3 + self.singletons * 2 + self.doubletons
 
-    @property
+    @ property
     def total_points(self) -> int:
         """ Return the total points (hcp and ssp) contained in this hand """
         return self.ssp + self.hcp
 
-    @property
+    @ property
     def ltc(self) -> int:
         """ Return the losing trick count for this hand - see bite description
             for the procedure
         """
         _ltc = 0
-        for suit in Suit:
-            suit_cards = [c[1] for c in self._cards if c[0] == suit]
-            ace = Rank['A'] in suit_cards
-            king = Rank['K'] in suit_cards
-            queen = Rank['Q'] in suit_cards
-            if len(suit_cards) == 1:
+        for suit, cards in self._suit_cards.items():
+            ace = Rank['A'] in cards
+            king = Rank['K'] in cards
+            queen = Rank['Q'] in cards
+            if len(cards) == 1:
                 if not ace:
                     _ltc += 1
-            elif len(suit_cards) == 2:
+            elif len(cards) == 2:
                 if ace and king:
                     pass
                 elif ace or king:
                     _ltc += 1
                 else:
                     _ltc += 2
-            elif len(suit_cards) >= 3:
+            elif len(cards) >= 3:
                 if ace and king and queen:
                     pass
                 elif (ace and king) or (ace and queen) or (king and queen):
