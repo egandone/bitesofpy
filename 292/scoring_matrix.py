@@ -1,4 +1,10 @@
 from typing import Union, List
+from collections import defaultdict
+
+
+class AminoAcidNotFoundError(KeyError):
+    pass
+
 
 # Grabbed matrix from from
 # https://www.ncbi.nlm.nih.gov/Class/FieldGuide/BLOSUM62.txt
@@ -41,18 +47,36 @@ def matrix_score(sequence1: str, sequence2: str, matrix_str: str = BLOSUM62) -> 
     Receives two proteins sequences and a matrix table
     Returns the score of two proteins according to the supplied matrix table
     """
-
-    # TODO: Complete function
-
+    lookups = {}
+    lines = [line.strip().split() for line in matrix_str.split('\n')
+             if not line.strip().startswith('#')]
+    for l in lines[1:]:
+        for i, e in enumerate(l[1:]):
+            lookups[(l[0], lines[0][i])] = int(e)
+    score = 0
+    for pair in zip(sequence1.upper(), sequence2.upper()):
+        if pair not in lookups:
+            raise AminoAcidNotFoundError(
+                f'Scoring matrix does not support scoring for: {pair}')
+        score += lookups[pair]
     return score
 
 
 def closest_match(
-    reference_sequence: str, query_sequences: List[str], matrix_str: str = BLOSUM62
-) -> Union[str, List, None]:
+        reference_sequence: str, query_sequences: List[str], matrix_str: str = BLOSUM62) -> Union[str, List, None]:
     """
     Receives a reference sequence, a list of query sequences and a matrix table
     Returns the closest matching sequence(s) or None
     """
-
-    # TODO: Complete function
+    match = None
+    if len(query_sequences) > 0:
+        scores = defaultdict(list)
+        for s in query_sequences:
+            score = matrix_score(reference_sequence, s, matrix_str)
+            scores[score].append(s)
+        max_score = max(scores)
+        if len(scores[max_score]) > 1:
+            match = scores[max_score]
+        else:
+            match = scores[max_score][0]
+    return match
