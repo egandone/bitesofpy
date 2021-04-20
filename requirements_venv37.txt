@@ -57,7 +57,7 @@ pip-upgrader==1.4.15
 pluggy==0.13.1
 prometheus-client==0.7.1
 prompt-toolkit==3.0.3
-py==1.8.1
+py==1.10.0
 pycodestyle==2.5.0
 pycparser==2.19
 pydot==1.4.1
